@@ -13,6 +13,10 @@ function interactive (java) {
     process.stdout.write(String(data).green);
   })
   java.stderr.pipe(process.stderr);
+  java.on('close', function (code) {
+    console.log('jssc exited with code', code);
+    process.exit(1);
+  })
 
   // make `process.stdin` begin emitting "keypress" events
   keypress(process.stdin);
@@ -21,12 +25,12 @@ function interactive (java) {
   process.stdin.on('keypress', function (ch, key) {
     if (key && key.ctrl && key.name == 'c') {
       process.stdin.pause();
-      java.kill('SIGHUP');
+      java.kill();
       return;
     }
 
     ch = ch.replace(/\r/, '\n')
-    // process.stdout.write(ch.green);
+    process.stdout.write(ch.yellow);
     java.stdin.write(ch);
   });
 

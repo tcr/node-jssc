@@ -10,6 +10,7 @@ public class Main {
     static SerialPort serialPort;
 
     public static void main(String[] args) {
+        // System.out.println("STARTING.");
         
         serialPort = new SerialPort(args[0]); 
         try {
@@ -22,7 +23,8 @@ public class Main {
             // serialPort.writeBytes("1".getBytes());
         }
         catch (SerialPortException ex) {
-            System.out.println(ex);
+            System.err.println(ex);
+            System.exit(1);
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -43,13 +45,13 @@ public class Main {
                 // System.out.println("READ " + baos.size());
                 serialPort.writeBytes(baos.toByteArray());
             } catch (IOException ex) {
+                System.err.println("IO error");
                 System.err.println(ex);
-                System.out.println("IO error");
-                System.exit(1);
+                System.exit(2);
             } catch (SerialPortException ex) {
+                System.err.println("Serialport write error");
                 System.err.println(ex);
-                System.out.println("Serialport error");
-                System.exit(1);
+                System.exit(3);
             }
         }
     }
@@ -74,7 +76,9 @@ public class Main {
                         // }
                     }
                     catch (SerialPortException ex) {
+                        System.err.println("Serialport read error");
                         System.err.println(ex);
+                        System.exit(4);
                     }
                 }
             }
