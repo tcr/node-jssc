@@ -42,6 +42,7 @@ public class Main {
                 while (br.ready()) {
                     baos.write(br.read());
                 }
+                // System.out.print(" \"" + new String(baos.toByteArray()) + "\"");
                 // System.out.println("READ " + baos.size());
                 serialPort.writeBytes(baos.toByteArray());
             } catch (IOException ex) {
