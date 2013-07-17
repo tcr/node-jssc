@@ -10,6 +10,7 @@ public class Main {
     static SerialPort serialPort;
 
     public static void main(String[] args) {
+        
         serialPort = new SerialPort(args[0]); 
         try {
             serialPort.openPort();//Open port
