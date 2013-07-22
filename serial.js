@@ -38,6 +38,9 @@ function interactive (java) {
   process.stdin.resume();
 }
 
+exports.listen = listen;
+exports.interactive = interactive;
+
 if (require.main == module) {
   interactive(listen(process.argv[2]));
 }

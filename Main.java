@@ -27,8 +27,6 @@ public class Main {
             System.exit(1);
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
       //  read the username from the command-line; need to use try/catch with the
       //  readLine() method
         while (true) {
@@ -36,11 +34,11 @@ public class Main {
 
             // System.out.println("TRYING TO READING...");
             try {
-                while (!br.ready()) { }
+                while (System.in.available() == 0) { }
                 int read;
             // System.out.println("READING...");
-                while (br.ready()) {
-                    baos.write(br.read());
+                while (System.in.available() > 0) {
+                    baos.write(System.in.read());
                 }
                 // System.out.print(" \"" + new String(baos.toByteArray()) + "\"");
                 // System.out.println("READ " + baos.size());
