@@ -1,6 +1,6 @@
 {
   "name": "jssc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "private": "true",
   "main": "serial.js",
@@ -12,6 +12,7 @@
   "license": "BSD",
   "dependencies": {
     "keypress": "~0.2.1",
-    "colors": "~0.6.0-1"
+    "colors": "~0.6.0-1",
+    "carrier": "~0.1.10"
   }
 }

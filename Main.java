@@ -1,3 +1,4 @@
+import javax.xml.bind.DatatypeConverter;
 import java.util.Scanner;
 import java.io.*;
 import jssc.SerialPort;
@@ -9,6 +10,24 @@ public class Main {
 
     static SerialPort serialPort;
 
+    static void outCommand (char type, byte[] buf) {
+        byte[] c = new byte[1 + buf.length];
+        System.out.print(type);
+        if (buf.length > 0) {
+            System.out.print(DatatypeConverter.printBase64Binary(buf));
+        }
+        System.out.println();
+    }
+
+    static void outError (Exception ex) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        try {
+            outCommand('E', sw.toString().getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) { }
+    }
+
     public static void main(String[] args) {
         // System.out.println("STARTING.");
         
@@ -19,37 +38,33 @@ public class Main {
             int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
             serialPort.setEventsMask(mask);//Set mask
             serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
-            // serialPort.writeBytes("AAAA".getBytes());
-            // serialPort.writeBytes("1".getBytes());
         }
         catch (SerialPortException ex) {
-            System.err.println(ex);
+            System.err.println("Error opening serial port.");
+            outError(ex);
             System.exit(1);
         }
+
+        outCommand('L', new byte[] {});
 
       //  read the username from the command-line; need to use try/catch with the
       //  readLine() method
         while (true) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
             // System.out.println("TRYING TO READING...");
+            BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));  
             try {
-                while (System.in.available() == 0) { }
-                int read;
-            // System.out.println("READING...");
-                while (System.in.available() > 0) {
-                    baos.write(System.in.read());
+                String input = stdin.readLine();
+                if (input.substring(0, 1).equals("O")) {
+                    byte[] o = DatatypeConverter.parseBase64Binary(input.substring(1));
+                    serialPort.writeBytes(o);
                 }
-                // System.out.print(" \"" + new String(baos.toByteArray()) + "\"");
-                // System.out.println("READ " + baos.size());
-                serialPort.writeBytes(baos.toByteArray());
             } catch (IOException ex) {
-                System.err.println("IO error");
-                System.err.println(ex);
+                System.err.println("Stdin error.");
+                outError(ex);
                 System.exit(2);
             } catch (SerialPortException ex) {
-                System.err.println("Serialport write error");
-                System.err.println(ex);
+                System.err.println("Writing error.");
+                outError(ex);
                 System.exit(3);
             }
         }
@@ -69,34 +84,43 @@ public class Main {
                     //Read data, if 10 bytes available 
                     try {
                         byte buffer[] = serialPort.readBytes(event.getEventValue());
-                        System.out.print(new String(buffer));
+                        outCommand('I', buffer);
+                        // System.out.print(new String(buffer));
                         // if (new String(buffer).contains("0 bytes available.\n")) {
                         //     serialPort.writeBytes("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789".getBytes());
                         // }
                     }
                     catch (SerialPortException ex) {
-                        System.err.println("Serialport read error");
-                        System.err.println(ex);
+                        System.err.println("Reading error.");
+                        outError(ex);
                         System.exit(4);
                     }
                 }
             }
-            else if(event.isCTS()){//If CTS line has changed state
-                if(event.getEventValue() == 1){//If line is ON
-                    System.err.println("CTS - ON");
+
+            // Clear to send
+            else if(event.isCTS()){
+                if(event.getEventValue() == 1){
+                    // on
+                   outCommand('C', new byte[] { });
                 }
                 else {
-                    System.err.println("CTS - OFF");
+                    // off
+                    outCommand('c', new byte[] { });
                 }
             }
-            else if(event.isDSR()){///If DSR line has changed state
-                if(event.getEventValue() == 1){//If line is ON
-                    System.err.println("DSR - ON");
+
+            // Data set ready
+            else if(event.isDSR()){
+                if(event.getEventValue() == 1){
+                    // on
+                    outCommand('D', new byte[] { });
                 }
                 else {
-                    System.err.println("DSR - OFF");
+                    outCommand('d', new byte[] { });
                 }
             }
         }
     }
 }
+
