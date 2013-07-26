@@ -11,12 +11,14 @@ public class Main {
     static SerialPort serialPort;
 
     static void outCommand (char type, byte[] buf) {
-        byte[] c = new byte[1 + buf.length];
-        System.out.print(type);
-        if (buf.length > 0) {
-            System.out.print(DatatypeConverter.printBase64Binary(buf));
+        synchronized (System.out) {
+            byte[] c = new byte[1 + buf.length];
+            System.out.print(type);
+            if (buf.length > 0) {
+                System.out.print(DatatypeConverter.printBase64Binary(buf));
+            }
+            System.out.println();
         }
-        System.out.println();
     }
 
     static void outError (Exception ex) {
