@@ -1,6 +1,6 @@
 {
   "name": "jssc",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "private": "true",
   "main": "serial.js",
