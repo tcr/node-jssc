@@ -1,8 +1,7 @@
 {
   "name": "jssc",
   "version": "0.1.0",
-  "description": "",
-  "private": "true",
+  "description": "JavaScript serial connection library.",
   "main": "serial.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
