@@ -59,6 +59,9 @@ public class Main {
                 if (input.substring(0, 1).equals("O")) {
                     byte[] o = DatatypeConverter.parseBase64Binary(input.substring(1));
                     serialPort.writeBytes(o);
+                } else if (input.substring(0, 1).equals("B")) {
+                    System.err.println("Break 5 seconds");
+                    serialPort.sendBreak(5000);
                 }
             } catch (IOException ex) {
                 System.err.println("Stdin error.");
