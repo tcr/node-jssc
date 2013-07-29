@@ -30,6 +30,12 @@ public class Main {
         } catch (UnsupportedEncodingException e) { }
     }
 
+    static void silentClose () {
+        try {
+            serialPort.closePort();
+        } catch (SerialPortException ex) { }
+    }
+
     public static void main(String[] args) {
         // System.out.println("STARTING.");
         
@@ -44,8 +50,15 @@ public class Main {
         catch (SerialPortException ex) {
             System.err.println("Error opening serial port.");
             outError(ex);
+            silentClose();
             System.exit(1);
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                silentClose();
+            }
+        });
 
         outCommand('L', new byte[] {});
 
@@ -66,10 +79,12 @@ public class Main {
             } catch (IOException ex) {
                 System.err.println("Stdin error.");
                 outError(ex);
+                silentClose();
                 System.exit(2);
             } catch (SerialPortException ex) {
                 System.err.println("Writing error.");
                 outError(ex);
+                silentClose();
                 System.exit(3);
             }
         }
@@ -98,6 +113,7 @@ public class Main {
                     catch (SerialPortException ex) {
                         System.err.println("Reading error.");
                         outError(ex);
+                        silentClose();
                         System.exit(4);
                     }
                 }
