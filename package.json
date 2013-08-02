@@ -1,6 +1,6 @@
 {
   "name": "jssc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript serial connection library.",
   "main": "serial.js",
   "scripts": {
