@@ -71,8 +71,22 @@ function interactive (java) {
   process.stdin.resume();
 }
 
+function list (next) {
+  var jssc = listen('--list', false);
+  var ports = [];
+  jssc.on('port', function (port) {
+    if (port) {
+      ports.push(port);
+    }
+  })
+  jssc.on('close', function () {
+    next(null, ports);
+  })
+}
+
 exports.listen = listen;
 exports.interactive = interactive;
+exports.list = list;
 
 if (require.main == module) {
   interactive(listen(process.argv[2], true));
