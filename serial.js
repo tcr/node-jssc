@@ -1,10 +1,11 @@
 var keypress = require('keypress')
   , spawn = require('child_process').spawn
   , colors = require('colors')
-  , carrier = require('carrier');
+  , carrier = require('carrier')
+  , path = require('path');
 
 function listen (port, debug) {
-  var java = spawn('java', ['-cp', './jSSC-2.6.0-Release/jssc.jar:.', 'Main', port], {
+  var java = spawn('java', ['-cp', './jSSC-2.6.0-Release/jssc.jar' + path.delimiter + '.', 'Main', port], {
     cwd: __dirname
   });
   java.debug = debug;
@@ -37,10 +38,6 @@ function listen (port, debug) {
   java.write = function (data, next) {
     java.send('O', data, next);
   };
-
-  if (port == '--list') {
-    java.send('P', new Buffer([]));
-  }
 
   return java;
 }
