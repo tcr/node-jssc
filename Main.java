@@ -2,6 +2,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.Scanner;
 import java.io.*;
 import jssc.SerialPort;
+import jssc.SerialPortList;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
@@ -38,29 +39,31 @@ public class Main {
 
     public static void main(String[] args) {
         // System.out.println("STARTING.");
-        
-        serialPort = new SerialPort(args[0]); 
-        try {
-            serialPort.openPort();//Open port
-            serialPort.setParams(9600, 8, 1, 0);//Set params
-            int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
-            serialPort.setEventsMask(mask);//Set mask
-            serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
-        }
-        catch (SerialPortException ex) {
-            System.err.println("Error opening serial port.");
-            outError(ex);
-            silentClose();
-            System.exit(1);
-        }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                silentClose();
+        if (!args[0].equals("--list")) {
+            serialPort = new SerialPort(args[0]); 
+            try {
+                serialPort.openPort();//Open port
+                serialPort.setParams(9600, 8, 1, 0);//Set params
+                int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
+                serialPort.setEventsMask(mask);//Set mask
+                serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener
             }
-        });
+            catch (SerialPortException ex) {
+                System.err.println("Error opening serial port.");
+                outError(ex);
+                silentClose();
+                System.exit(1);
+            }
 
-        outCommand('L', new byte[] {});
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                public void run() {
+                    silentClose();
+                }
+            });
+
+            outCommand('L', new byte[] {});
+        }
 
       //  read the username from the command-line; need to use try/catch with the
       //  readLine() method
@@ -75,6 +78,12 @@ public class Main {
                 } else if (input.substring(0, 1).equals("B")) {
                     System.err.println("Break 5 seconds");
                     serialPort.sendBreak(5000);
+                } else if (input.substring(0, 1).equals("P")) {
+                    String[] portNames = SerialPortList.getPortNames();
+                    for (int i = 0; i < portNames.length; i++){
+                        outCommand('p', portNames[i].getBytes());
+                    }
+                    outCommand('p', new byte[] { });
                 }
             } catch (IOException ex) {
                 System.err.println("Stdin error.");

@@ -24,6 +24,8 @@ function listen (port, debug) {
       // data set ready
       case 'D': java.emit('dsr', true); return;
       case 'd': java.emit('dsr', false); return;
+      // available ports
+      case 'p': java.emit('port', payload); return;
     }
   })
   java.send = function (type, data, next) {
@@ -35,6 +37,10 @@ function listen (port, debug) {
   java.write = function (data, next) {
     java.send('O', data, next);
   };
+
+  if (port == '--list') {
+    java.send('P', new Buffer([]));
+  }
 
   return java;
 }
