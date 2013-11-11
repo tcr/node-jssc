@@ -2,10 +2,13 @@ var keypress = require('keypress')
   , spawn = require('child_process').spawn
   , colors = require('colors')
   , carrier = require('carrier')
-  , path = require('path');
+  , path = require('path')
+  , fs = require('fs');
 
 function listen (port, debug) {
-  var java = spawn('java', ['-cp', './jSSC-2.6.0-Release/jssc.jar' + path.delimiter + '.', 'Main', port], {
+  var java = spawn(process.platform != 'win32' ? 'java'
+    : fs.existsSync('c:\\windows\\syswow64') ? 'c:\\windows\\syswow64\\java.exe'
+    : 'c:\\windows\\system32\\java.exe', ['-cp', './jSSC-2.6.0-Release/jssc.jar' + path.delimiter + '.', 'Main', port], {
     cwd: __dirname
   });
   java.debug = debug;
